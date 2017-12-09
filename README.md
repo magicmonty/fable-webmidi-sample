@@ -89,4 +89,4 @@ Check more [Fable samples](https://github.com/fable-compiler/samples-browser) an
 [Paket]: https://fsprojects.github.io/Paket/
 [Paket website]: https://fsprojects.github.io/Paket/
 [Babel]: https://babeljs.io/
-[F# Adevent 2017](https://sergeytihon.com/2017/10/22/f-advent-calendar-in-english-2017/)
+[F# Adevent 2017]: https://sergeytihon.com/2017/10/22/f-advent-calendar-in-english-2017/
