@@ -36,7 +36,7 @@ Any modification you do to the F# code will be reflected in the web page after s
 
 ## JS Output
 
-This template uses [babel-preset-env] to output JS code whose syntax is compatible with a wide range of browsers. Currently it's set to support only Chrome. 
+This template uses [babel-preset-env] to output JS code whose syntax is compatible with a wide range of browsers. Currently it's set to support only Chrome.
 
 ## Project structure
 
@@ -89,3 +89,4 @@ Check more [Fable samples](https://github.com/fable-compiler/samples-browser) an
 [Paket]: https://fsprojects.github.io/Paket/
 [Paket website]: https://fsprojects.github.io/Paket/
 [Babel]: https://babeljs.io/
+[F# Adevent 2017](https://sergeytihon.com/2017/10/22/f-advent-calendar-in-english-2017/)
