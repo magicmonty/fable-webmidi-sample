@@ -23,7 +23,7 @@ type MIDIPortConnectionState =
     | Pending
 
 type IMIDIPort =
-    inherit Browser.EventTarget
+    inherit Browser.Types.EventTarget
     abstract member id: string with get
     abstract member manufacturer: string option with get
     abstract member name: string option with get
@@ -38,7 +38,7 @@ type IMIDIPort =
     abstract member close : unit -> JS.Promise<IMIDIPort>
 
 and IMIDIConnectionEvent =
-    inherit Browser.EventType
+    inherit Browser.Types.EventTarget
     abstract member port : IMIDIPort with get
 
 type IMIDIOutput =
@@ -51,7 +51,7 @@ type IMIDIOutput =
 type IMIDIOutputMap = JS.Map<string, IMIDIOutput>
 
 type IMIDIMessageEvent =
-    inherit Browser.EventType
+    inherit Browser.Types.EventTarget
     abstract member receivedTime: double
     abstract member data: byte array
     
@@ -62,7 +62,7 @@ type IMIDIInput =
 type IMIDIInputMap = JS.Map<string, IMIDIInput>
 
 type IMIDIAccess = 
-    inherit Browser.EventTarget
+    inherit Browser.Types.EventTarget
     abstract member inputs : IMIDIInputMap with get
     abstract member outputs : IMIDIOutputMap with get
     abstract member onstatechange : (IMIDIConnectionEvent -> unit) with set
@@ -74,8 +74,6 @@ module internal Intern =
 
     [<Emit("navigator.requestMIDIAccess($0)")>]
     let requestAccess (options : obj) : JS.Promise<IMIDIAccess> = jsNative
-
-open Fable.PowerPack
 
 [<RequireQualifiedAccess>]
 module MIDI =
