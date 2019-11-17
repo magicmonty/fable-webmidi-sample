@@ -1,7 +1,7 @@
 dotnet-fable
 Fable.Core
-Fable.Import.Browser
-Fable.Aether
+Fable.Browser.Dom 
+Fable.Browser.Performance
 Fable.Elmish.Browser
 Fable.Elmish.Debugger
 Fable.Elmish.React

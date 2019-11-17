@@ -23,15 +23,15 @@ type Msg =
   | SendNote                        // Send a MIDI note
 
 open Elmish
-open Fable.Import
-open Fable.Helpers.React
-
+open Fable.React
+open Fable.Core
+open Browser
 let init () : Model*Cmd<Msg> =
     { MIDIOutputs = []
       SelectedMIDIOutput = None
       MIDIAccess = None
       IsMIDIEnabled = false
-      Messages = [] }, Cmd.ofPromise MIDI.requestAccess [ Sysex true ] MIDIConnected MIDIError
+      Messages = [] }, Cmd.OfPromise.either MIDI.requestAccess [ Sysex true ] MIDIConnected MIDIError
 
 [<RequireQualifiedAccess>]
 module JSMap =
@@ -43,17 +43,19 @@ module JSMap =
 let sendNote (midiAccess: IMIDIAccess) portId =
     let output = midiAccess.outputs.get(portId);
     
+    // middle C
+    let note = 60uy
     // note on, middle C, full velocity
-    let noteOnMessage = [| 0x90uy; 60uy; 0x7fuy |]
+    let noteOnMessage = [| 0x90uy; note; 0x7fuy |]
     
     // note off, middle C, release velocity = 64 
-    let noteOffMessage = [| 0x80uy; 60uy; 0x40uy |]
+    let noteOffMessage = [| 0x80uy; note ; 0x40uy |]
     
     //omitting the timestamp means send immediately.
-    output.send noteOnMessage   
+    output.SendAt (Browser.Performance.performance.now()) noteOnMessage   
     
     // timestamp = now + 1000ms.
-    noteOffMessage |> output.SendAt (Browser.window.performance.now() + 1000.0)
+    noteOffMessage |> output.SendAt (Browser.Performance.performance.now() + 1000.)
 
 let update (msg:Msg) (model:Model) : Model*Cmd<Msg> =    
     let success = Success >> Message >> Cmd.ofMsg
@@ -98,12 +100,15 @@ let update (msg:Msg) (model:Model) : Model*Cmd<Msg> =
                                           | id -> Some id }, Cmd.none
     | SendNote -> 
         match model.MIDIAccess, model.SelectedMIDIOutput with
-        | Some midi, Some out -> model, Cmd.ofFunc (sendNote midi) out (fun _ -> Message (Success "sent")) (fun ex -> Message (Error ex.Message))
+        | Some midi, Some out -> model, Cmd.OfFunc.either (sendNote midi) out (fun _ -> Message (Success "sent")) (fun ex -> Message (Error ex.Message))
         | Some _, None -> model, error "No Output"
         | _, _ -> model, error "No MIDI connection"
 
-open Fable.Helpers.React
-open Fable.Helpers.React.Props
+open Fable.React
+open Fable.React
+open Fable.React.Props
+open Fable.React.Helpers
+
 open Fable.Core.JsInterop
 
 let view model dispatch =
@@ -117,9 +122,9 @@ let view model dispatch =
                             label [ ClassName "col-form-label" ] [ str "Outputs" ]
                             select [ ClassName "form-control" 
                                      Value (model.SelectedMIDIOutput |> Option.defaultValue "") 
-                                     OnChange (fun (ev:React.FormEvent) -> dispatch (OutputSelected (!! ev.target?value))) ] [
+                                     OnChange (fun (ev: Browser.Types.Event) -> dispatch (OutputSelected (!! ev.target?value))) ] [
                                          for key, name in model.MIDIOutputs do
-                                            yield option [ Key key ] [ str name ]
+                                            yield option [ Key key; Value key] [ str name ]
                                      ]
                         ]
                     ]
@@ -149,5 +154,5 @@ let view model dispatch =
 open Elmish.React
 
 Program.mkProgram init update view
-|> Program.withReact "midi-app"
+|> Program.withReactBatched "midi-app"
 |> Program.run
